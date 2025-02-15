@@ -1,0 +1,25 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "rss agregator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Katerus16/frontend-project-11.git"
+  },
+  "author": "katerus16",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Katerus16/frontend-project-11/issues"
+  },
+  "homepage": "https://github.com/Katerus16/frontend-project-11#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0"
+  }
+}
