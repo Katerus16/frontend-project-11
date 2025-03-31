@@ -1,4 +1,5 @@
 import './style.scss';
 import 'bootstrap';
+import app from './watcher.js'
 
-console.log('Hello, webpack!123');
+app();
