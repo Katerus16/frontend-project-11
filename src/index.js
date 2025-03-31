@@ -1,4 +1,4 @@
 import './style.scss';
 import 'bootstrap';
 
-console.log("Hello, webpack!123");
+console.log('Hello, webpack!123');
