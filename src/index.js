@@ -1,5 +1,14 @@
 import './style.scss';
 import 'bootstrap';
-import app from './watcher.js'
+import i18next from 'i18next';
+import resources from './locale/index.js';
+import app from './watcher.js';
 
-app();
+const runApp = async () => {
+  await i18next.init({
+    lng: 'ru',
+    resources,
+  });
+};
+
+app(runApp);

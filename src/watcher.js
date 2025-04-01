@@ -1,5 +1,6 @@
 import onChange from 'on-change';
 import { isEmpty } from 'lodash';
+import i18next from 'i18next';
 import isValid from './validate.js';
 
 const handleSubmit = (watchedState) => async (e) => {
@@ -7,7 +8,7 @@ const handleSubmit = (watchedState) => async (e) => {
   const formData = new FormData(e.target);
   const valueUrl = formData.get('url');
   watchedState.errors = await isValid(valueUrl, watchedState);
-  if (isEmpty(watchedState.errors.error)) {
+  if (isEmpty(watchedState.errors)) {
     watchedState.form.state = 'valid';
     watchedState.form.data.link.push(valueUrl);
     e.target.reset();
@@ -21,21 +22,23 @@ const createFeedbackElement = () => {
   elem.classList.add('feedback', 'm-0', 'position-absolute', 'small', 'text-success');
   document.querySelector('form').parentNode.appendChild(elem);
   return elem;
-}
+};
 
 const renderErrors = (errors) => {
   const elem = document.querySelector('p.feedback') === null ? createFeedbackElement() : document.querySelector('p.feedback');
   elem.classList.add('text-danger');
-  elem.textContent = errors.error;
+  elem.textContent = errors.join();
 };
 
 const renderSuccess = () => {
   const elem = document.querySelector('p.feedback') === null ? createFeedbackElement() : document.querySelector('p.feedback');
   elem.classList.remove('text-danger');
-  elem.textContent = 'RSS успешно добавлен';
+  elem.textContent = i18next.t('successUrl');
+  console.log('renderS');
 };
 
-export default () => {
+export default async (runApp) => {
+  await runApp();
   const state = {
     form: {
       state: 'valid',
@@ -43,7 +46,7 @@ export default () => {
         link: [],
       },
     },
-    errors: {},
+    errors: [],
   };
 
   const watchedState1 = onChange(state, (path, value) => {

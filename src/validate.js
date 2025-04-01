@@ -1,17 +1,29 @@
 import * as yup from 'yup';
+import i18next from 'i18next';
 
-const schema = yup.object().shape({
-  name: yup.string().url(),
+yup.setLocale({
+  mixed: {
+    default: 'error',
+  },
+  string: {
+    url: () => ({ key: 'invalidUrl' }),
+  },
+  array: {
+    unique: () => ({ key: 'notUniqueUrl' }),
+  },
 });
 
+yup.addMethod(yup.array, 'unique', function unique() {
+  return this.test('unique', { key: 'notUniqueUrl' }, (list) => list.length === new Set(list).size);
+});
+
+const schema = yup.array().of(yup.string().url()).unique();
+
 const isValid = async (value, validState) => {
-  const valid = await schema.isValid({ name: value });
-  if (!valid) {
-    return { error: 'Ссылка должна быть валидным URL' };
+  try { await schema.validate([...validState.form.data.link, value]); } catch (err) {
+    const messages = err.errors.map((error) => i18next.t(error.key));
+    return messages;
   }
-  if (validState.form.data.link.includes(value)) {
-    return { error: 'RSS уже существует' };
-  }
-  return { error: '' };
+  return [];
 };
 export default isValid;
