@@ -3,5 +3,7 @@ export default {
     successUrl: 'RSS успешно добавлен',
     notUniqueUrl: 'RSS уже существует',
     invalidUrl: 'Ссылка должна быть валидным URL',
+    errorParser: 'Ресурс не содержит валидный RSS',
+    errorNetwork: 'Ошибка сети',
   },
 };

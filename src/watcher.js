@@ -1,7 +1,11 @@
 import onChange from 'on-change';
 import { isEmpty } from 'lodash';
-import i18next from 'i18next';
+import axios from 'axios';
 import isValid from './validate.js';
+import parser from './parser.js';
+import {
+  create, renderErrors, renderSuccess, renderErrorsParser, renderErrorsNetwork,
+} from './renderHTML.js';
 
 const handleSubmit = (watchedState) => async (e) => {
   e.preventDefault();
@@ -17,25 +21,7 @@ const handleSubmit = (watchedState) => async (e) => {
   }
 };
 
-const createFeedbackElement = () => {
-  const elem = document.createElement('p');
-  elem.classList.add('feedback', 'm-0', 'position-absolute', 'small', 'text-success');
-  document.querySelector('form').parentNode.appendChild(elem);
-  return elem;
-};
-
-const renderErrors = (errors) => {
-  const elem = document.querySelector('p.feedback') === null ? createFeedbackElement() : document.querySelector('p.feedback');
-  elem.classList.add('text-danger');
-  elem.textContent = errors.join();
-};
-
-const renderSuccess = () => {
-  const elem = document.querySelector('p.feedback') === null ? createFeedbackElement() : document.querySelector('p.feedback');
-  elem.classList.remove('text-danger');
-  elem.textContent = i18next.t('successUrl');
-  console.log('renderS');
-};
+const getFeed = async (link) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${link}`);
 
 export default async (runApp) => {
   await runApp();
@@ -47,14 +33,29 @@ export default async (runApp) => {
       },
     },
     errors: [],
+    feeds: [],
+    posts: [],
   };
-
-  const watchedState1 = onChange(state, (path, value) => {
+  const watchedState1 = onChange(state, async (path, value) => {
     if (path.startsWith('errors') && !isEmpty(value)) {
       renderErrors(value);
     }
     if (path.startsWith('form.data.link')) {
-      renderSuccess();
+      try {
+        const getTestFeed = await getFeed(value[value.length - 1]);
+        const { feed, posts } = parser(getTestFeed.data.contents);
+        state.feeds.push(feed);
+        state.posts.push(...posts);
+        create(state.feeds, state.posts);
+        renderSuccess();
+      } catch (err) {
+        state.form.data.link = state.form.data.link.slice(0, -1);
+        if (err.message === 'Network Error') {
+          renderErrorsNetwork();
+        } else {
+          renderErrorsParser();
+        }
+      }
     }
   });
 
