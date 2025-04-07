@@ -28,7 +28,6 @@ export const renderSuccess = () => {
   const elem = document.querySelector('p.feedback') === null ? createFeedbackElement() : document.querySelector('p.feedback');
   elem.classList.remove('text-danger');
   elem.textContent = i18next.t('successUrl');
-  console.log('renderS');
 };
 
 const createFeeds = (feed) => {
