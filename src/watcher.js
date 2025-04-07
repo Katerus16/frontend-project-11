@@ -21,6 +21,18 @@ const handleSubmit = (watchedState) => async (e) => {
   }
 };
 
+const handleClick = (watchedState) => (e) => {
+  const h5 = document.querySelector('#modal h5');
+  const { id } = e.target.dataset;
+  const { link, title, description } = watchedState.posts.find((post) => post.id === id);
+  h5.textContent = title;
+  const divBody = document.querySelector('.modal-body');
+  divBody.textContent = description;
+  const a = document.querySelector('#modal a');
+  a.setAttribute('href', link);
+  watchedState.shownPosts.push(id);
+};
+
 const getFeed = async (link) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${link}`);
 
 export default async (runApp) => {
@@ -35,8 +47,14 @@ export default async (runApp) => {
     errors: [],
     feeds: [],
     posts: [],
+    shownPosts: [],
   };
   const watchedState1 = onChange(state, async (path, value) => {
+    if(path.startsWith('shownPosts')) {
+      const a = document.querySelector(`a[data-id="${value[value.length - 1]}"]`);
+      a.classList.remove('fw-bold');
+      a.classList.add('fw-normal');
+    }
     if (path.startsWith('errors') && !isEmpty(value)) {
       renderErrors(value);
     }
@@ -49,13 +67,13 @@ export default async (runApp) => {
           const newPosts = posts.filter(
             (newPost) => !state.posts.find((post) => post.title === newPost.title),
           );
+          state.posts.push(...newPosts);
           if (!state.feeds.find((feed) => newFeed.title === feed.title)) {
             state.feeds.push(newFeed);
+            create(newFeed, newPosts, handleClick(watchedState1));
+          } else {
+            create(null, newPosts, handleClick(watchedState1));
           }
-          console.log(newPosts);
-          console.log(newFeed);
-          state.posts.push(...newPosts);
-          create([newFeed], newPosts);
           setTimeout(parseAndCreate, 5000);
         };
         parseAndCreate();

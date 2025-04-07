@@ -31,24 +31,22 @@ export const renderSuccess = () => {
   console.log('renderS');
 };
 
-const createFeeds = (feeds) => {
-  feeds.forEach((feed) => {
-    const liFeeds = document.createElement('li');
-    liFeeds.classList.add('list-group-item', 'border-0', 'border-end-0');
-    const ulFeeds = document.querySelector('div.feeds ul');
-    ulFeeds.appendChild(liFeeds);
-    const h3Feeds = document.createElement('h3');
-    h3Feeds.classList.add('h6', 'm-0');
-    h3Feeds.textContent = feed.title;
-    liFeeds.appendChild(h3Feeds);
-    const pFeeds = document.createElement('p');
-    pFeeds.classList.add('m-0', 'small', 'text-black-50');
-    pFeeds.textContent = feed.description;
-    liFeeds.appendChild(pFeeds);
-  });
+const createFeeds = (feed) => {
+  const liFeeds = document.createElement('li');
+  liFeeds.classList.add('list-group-item', 'border-0', 'border-end-0');
+  const ulFeeds = document.querySelector('div.feeds ul');
+  ulFeeds.appendChild(liFeeds);
+  const h3Feeds = document.createElement('h3');
+  h3Feeds.classList.add('h6', 'm-0');
+  h3Feeds.textContent = feed.title;
+  liFeeds.appendChild(h3Feeds);
+  const pFeeds = document.createElement('p');
+  pFeeds.classList.add('m-0', 'small', 'text-black-50');
+  pFeeds.textContent = feed.description;
+  liFeeds.appendChild(pFeeds);
 };
 
-const createPosts = (posts) => {
+const createPosts = (posts, handleClick) => {
   posts.forEach((post) => {
     const liPosts = document.createElement('li');
     liPosts.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
@@ -67,21 +65,19 @@ const createPosts = (posts) => {
     buttonPosts.dataset.id = post.id;
     buttonPosts.setAttribute('type', 'button');
     buttonPosts.textContent = 'Просмотр';
+    buttonPosts.addEventListener('click', handleClick);
     buttonPosts.dataset.bsToggle = 'modal';
     buttonPosts.dataset.bsTarget = '#modal';
     liPosts.appendChild(buttonPosts);
   });
 };
 
-export const create = (feeds, posts) => {
+export const create = (feed, posts, handleClick) => {
   const divPosts = document.querySelector('div.posts');
   const divFeeds = document.querySelector('div.feeds');
-  if (isEmpty(feeds) || isEmpty(posts)) {
-    return;
-  }
   if (document.querySelector('div.posts ul')) {
-    createPosts(posts);
-    createFeeds(feeds);
+    createPosts(posts, handleClick);
+    if (feed) { createFeeds(feed); }
   } else {
     const divCardFeeds = document.createElement('div');
     divCardFeeds.classList.add('card', 'border-0');
@@ -109,7 +105,7 @@ export const create = (feeds, posts) => {
     const ulFeeds = document.createElement('ul');
     ulFeeds.classList.add('list-group', 'border-0', 'rounded-0');
     divCardFeeds.appendChild(ulFeeds);
-    createPosts(posts);
-    createFeeds(feeds);
+    createPosts(posts, handleClick);
+    if (feed) { createFeeds(feed); }
   }
 };
