@@ -42,11 +42,23 @@ export default async (runApp) => {
     }
     if (path.startsWith('form.data.link')) {
       try {
-        const getTestFeed = await getFeed(value[value.length - 1]);
-        const { feed, posts } = parser(getTestFeed.data.contents);
-        state.feeds.push(feed);
-        state.posts.push(...posts);
-        create(state.feeds, state.posts);
+        const parseAndCreate = async () => {
+          const getTestFeed = await getFeed(value[value.length - 1]);
+          const { feed: newFeed, posts } = parser(getTestFeed.data.contents);
+          console.log(newFeed);
+          const newPosts = posts.filter(
+            (newPost) => !state.posts.find((post) => post.title === newPost.title),
+          );
+          if (!state.feeds.find((feed) => newFeed.title === feed.title)) {
+            state.feeds.push(newFeed);
+          }
+          console.log(newPosts);
+          console.log(newFeed);
+          state.posts.push(...newPosts);
+          create([newFeed], newPosts);
+          setTimeout(parseAndCreate, 5000);
+        };
+        parseAndCreate();
         renderSuccess();
       } catch (err) {
         state.form.data.link = state.form.data.link.slice(0, -1);

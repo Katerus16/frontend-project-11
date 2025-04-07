@@ -31,10 +31,11 @@ export const renderSuccess = () => {
   console.log('renderS');
 };
 
-const createFeeds = (ulFeeds, feeds) => {
+const createFeeds = (feeds) => {
   feeds.forEach((feed) => {
     const liFeeds = document.createElement('li');
     liFeeds.classList.add('list-group-item', 'border-0', 'border-end-0');
+    const ulFeeds = document.querySelector('div.feeds ul');
     ulFeeds.appendChild(liFeeds);
     const h3Feeds = document.createElement('h3');
     h3Feeds.classList.add('h6', 'm-0');
@@ -47,10 +48,11 @@ const createFeeds = (ulFeeds, feeds) => {
   });
 };
 
-const createPosts = (ulPosts, posts) => {
+const createPosts = (posts) => {
   posts.forEach((post) => {
     const liPosts = document.createElement('li');
     liPosts.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+    const ulPosts = document.querySelector('div.posts ul');
     ulPosts.appendChild(liPosts);
     const aPosts = document.createElement('a');
     aPosts.classList.add('fw-bold');
@@ -74,37 +76,40 @@ const createPosts = (ulPosts, posts) => {
 export const create = (feeds, posts) => {
   const divPosts = document.querySelector('div.posts');
   const divFeeds = document.querySelector('div.feeds');
-  divFeeds.innerHTML = '';
-  divPosts.innerHTML = '';
   if (isEmpty(feeds) || isEmpty(posts)) {
     return;
   }
-  const divCardFeeds = document.createElement('div');
-  divCardFeeds.classList.add('card', 'border-0');
-  divFeeds.appendChild(divCardFeeds);
-  const divCardBodyFeeds = document.createElement('div');
-  divCardBodyFeeds.classList.add('card-body');
-  divCardFeeds.appendChild(divCardBodyFeeds);
-  const h2Feeds = document.createElement('h2');
-  h2Feeds.classList.add('card-title', 'h4');
-  divCardBodyFeeds.appendChild(h2Feeds);
-  h2Feeds.textContent = 'Фиды';
-  const divCardPosts = document.createElement('div');
-  divCardPosts.classList.add('card', 'border-0');
-  divPosts.appendChild(divCardPosts);
-  const divCardBodyPosts = document.createElement('div');
-  divCardBodyPosts.classList.add('card-body');
-  divCardPosts.appendChild(divCardBodyPosts);
-  const ulPosts = document.createElement('ul');
-  ulPosts.classList.add('list-group', 'border-0', 'rounded-0');
-  divCardPosts.appendChild(ulPosts);
-  const h2Posts = document.createElement('h2');
-  h2Posts.classList.add('card-title', 'h4');
-  divCardBodyPosts.appendChild(h2Posts);
-  h2Posts.textContent = 'Посты';
-  const ulFeeds = document.createElement('ul');
-  ulFeeds.classList.add('list-group', 'border-0', 'rounded-0');
-  divCardFeeds.appendChild(ulFeeds);
-  createPosts(ulPosts, posts);
-  createFeeds(ulFeeds, feeds);
+  if (document.querySelector('div.posts ul')) {
+    createPosts(posts);
+    createFeeds(feeds);
+  } else {
+    const divCardFeeds = document.createElement('div');
+    divCardFeeds.classList.add('card', 'border-0');
+    divFeeds.appendChild(divCardFeeds);
+    const divCardBodyFeeds = document.createElement('div');
+    divCardBodyFeeds.classList.add('card-body');
+    divCardFeeds.appendChild(divCardBodyFeeds);
+    const h2Feeds = document.createElement('h2');
+    h2Feeds.classList.add('card-title', 'h4');
+    divCardBodyFeeds.appendChild(h2Feeds);
+    h2Feeds.textContent = 'Фиды';
+    const divCardPosts = document.createElement('div');
+    divCardPosts.classList.add('card', 'border-0');
+    divPosts.appendChild(divCardPosts);
+    const divCardBodyPosts = document.createElement('div');
+    divCardBodyPosts.classList.add('card-body');
+    divCardPosts.appendChild(divCardBodyPosts);
+    const ulPosts = document.createElement('ul');
+    ulPosts.classList.add('list-group', 'border-0', 'rounded-0');
+    divCardPosts.appendChild(ulPosts);
+    const h2Posts = document.createElement('h2');
+    h2Posts.classList.add('card-title', 'h4');
+    divCardBodyPosts.appendChild(h2Posts);
+    h2Posts.textContent = 'Посты';
+    const ulFeeds = document.createElement('ul');
+    ulFeeds.classList.add('list-group', 'border-0', 'rounded-0');
+    divCardFeeds.appendChild(ulFeeds);
+    createPosts(posts);
+    createFeeds(feeds);
+  }
 };
