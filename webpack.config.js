@@ -15,7 +15,7 @@ export default {
     ],
   },
   entry: {
-    main: path.resolve(__dirname, './src/index.js')
+    main: path.resolve(__dirname, './src/index.js'),
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -25,6 +25,6 @@ export default {
   devServer: {
     static: path.resolve(__dirname),
     port: 8080,
-    hot: true
+    hot: true,
   },
 };

@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-undef */
 import onChange from 'on-change';
 import { isEmpty } from 'lodash';
 import axios from 'axios';
@@ -50,7 +52,7 @@ export default async (runApp) => {
     shownPosts: [],
   };
   const watchedState1 = onChange(state, async (path, value) => {
-    if(path.startsWith('shownPosts')) {
+    if (path.startsWith('shownPosts')) {
       const a = document.querySelector(`a[data-id="${value[value.length - 1]}"]`);
       a.classList.remove('fw-bold');
       a.classList.add('fw-normal');
@@ -63,7 +65,6 @@ export default async (runApp) => {
         const parseAndCreate = async () => {
           const getTestFeed = await getFeed(value[value.length - 1]);
           const { feed: newFeed, posts } = parser(getTestFeed.data.contents);
-          console.log(newFeed);
           const newPosts = posts.filter(
             (newPost) => !state.posts.find((post) => post.title === newPost.title),
           );

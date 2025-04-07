@@ -1,5 +1,5 @@
+/* eslint-disable no-undef */
 import i18next from 'i18next';
-import { isEmpty } from 'lodash';
 
 export const createFeedbackElement = () => {
   const elem = document.createElement('p');
