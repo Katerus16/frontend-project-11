@@ -77,7 +77,7 @@ export default async (runApp) => {
           }
           setTimeout(parseAndCreate, 5000);
         };
-        parseAndCreate();
+        await parseAndCreate();
         renderSuccess();
       } catch (err) {
         state.form.data.link = state.form.data.link.slice(0, -1);
