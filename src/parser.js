@@ -1,6 +1,7 @@
 import { uniqueId } from 'lodash';
 
 export default (xmlString) => {
+  console.log(xmlString);
   // eslint-disable-next-line no-undef
   const parser = new DOMParser();
   const doc1 = parser.parseFromString(xmlString.replace('\n', ''), 'application/xml');
