@@ -3,7 +3,7 @@ import { uniqueId } from 'lodash';
 export default (xmlString) => {
   // eslint-disable-next-line no-undef
   const parser = new DOMParser();
-  const doc1 = parser.parseFromString(xmlString.replaceAll('\n', ''), 'application/xml');
+  const doc1 = parser.parseFromString(xmlString.replaceAll('\n', '').replaceAll('  ', ''), 'application/xml');
   if (doc1.documentElement.nodeName !== 'rss') {
     throw new Error();
   }
