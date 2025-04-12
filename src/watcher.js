@@ -93,7 +93,7 @@ export default async (runApp) => {
     if (path.startsWith('errors') && !isEmpty(value)) {
       renderErrors(value);
     }
-    if (path.startsWith('errorsMessage')) {
+    if (path.startsWith('errorMessage')) {
       if (value === 'Network Error') {
         renderErrorsNetwork();
       } else {
