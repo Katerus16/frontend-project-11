@@ -19,8 +19,8 @@ yup.addMethod(yup.array, 'unique', function unique() {
 
 const schema = yup.array().of(yup.string().url()).unique();
 
-const isValid = async (value, validState) => {
-  try { await schema.validate([...validState.form.data.link, value]); } catch (err) {
+const isValid = async (value, links) => {
+  try { await schema.validate([...links, value]); } catch (err) {
     const messages = err.errors.map((error) => i18next.t(error.key));
     return messages;
   }

@@ -6,14 +6,22 @@ import axios from 'axios';
 import isValid from './validate.js';
 import parser from './parser.js';
 import {
-  create, renderErrors, renderSuccess, renderErrorsParser, renderErrorsNetwork,
+  renderErrors, renderSuccess, renderErrorsParser, renderErrorsNetwork, renderModal, createPosts,
+  createFeeds,
 } from './renderHTML.js';
+
+const getFeed = async (link) => {
+  const url = new URL('https://allorigins.hexlet.app/get');
+  url.searchParams.set('disableCache', 'true');
+  url.searchParams.set('url', `${link}`);
+  return axios.get(url);
+};
 
 const handleSubmit = (watchedState) => async (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const valueUrl = formData.get('url');
-  watchedState.errors = await isValid(valueUrl, watchedState);
+  watchedState.errors = await isValid(valueUrl, watchedState.form.data.link);
   if (isEmpty(watchedState.errors)) {
     watchedState.form.state = 'valid';
     watchedState.form.data.link.push(valueUrl);
@@ -21,27 +29,41 @@ const handleSubmit = (watchedState) => async (e) => {
   } else {
     watchedState.form.state = 'invalid';
   }
+  try {
+    const parseAndPush = async () => {
+      const getTestFeed = await getFeed(valueUrl);
+      const { feed: newFeed, posts } = parser(getTestFeed.data.contents);
+      const newPosts = posts.filter(
+        (newPost) => !watchedState.posts.find((post) => post.title === newPost.title),
+      );
+      watchedState.posts.push(...newPosts);
+      if (!watchedState.feeds.find((feed) => newFeed.title === feed.title)) {
+        watchedState.feeds.push(newFeed);
+      }
+      setTimeout(parseAndPush, 5000);
+    };
+    await parseAndPush();
+  } catch (err) {
+    watchedState.form.data.link = watchedState.form.data.link.slice(0, -1);
+    if (err.message === 'Network Error') {
+      watchedState.errorMessage = 'Network Error';
+    } else {
+      watchedState.errorMessage = 'Parser Error';
+    }
+  }
 };
 
 const handleClick = (watchedState) => (e) => {
-  const h5 = document.querySelector('#modal h5');
   const { id } = e.target.dataset;
-  const { link, title, description } = watchedState.posts.find((post) => post.id === id);
-  h5.textContent = title;
-  const divBody = document.querySelector('.modal-body');
-  divBody.textContent = description;
-  const a = document.querySelector('#modal a');
-  a.setAttribute('href', link);
   watchedState.shownPosts.push(id);
+  watchedState.currentPost = id;
 };
-
-const getFeed = async (link) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${link}`);
 
 export default async (runApp) => {
   await runApp();
   const state = {
     form: {
-      state: 'valid',
+      state: '',
       data: {
         link: [],
       },
@@ -50,8 +72,19 @@ export default async (runApp) => {
     feeds: [],
     posts: [],
     shownPosts: [],
+    currentPost: null,
+    errorMessage: '',
   };
-  const watchedState1 = onChange(state, async (path, value) => {
+  const watchedState1 = onChange(state, async (path, value, previousValue) => {
+    if (path.startsWith('currentPost')) {
+      const { link, title, description } = state.posts.find((post) => post.id === value);
+      renderModal(link, title, description);
+    }
+    if (path.startsWith('form.state')) {
+      if (value === 'valid') {
+        renderSuccess();
+      }
+    }
     if (path.startsWith('shownPosts')) {
       const a = document.querySelector(`a[data-id="${value[value.length - 1]}"]`);
       a.classList.remove('fw-bold');
@@ -60,33 +93,20 @@ export default async (runApp) => {
     if (path.startsWith('errors') && !isEmpty(value)) {
       renderErrors(value);
     }
-    if (path.startsWith('form.data.link')) {
-      try {
-        const parseAndCreate = async () => {
-          const getTestFeed = await getFeed(value[value.length - 1]);
-          const { feed: newFeed, posts } = parser(getTestFeed.data.contents);
-          const newPosts = posts.filter(
-            (newPost) => !state.posts.find((post) => post.title === newPost.title),
-          );
-          state.posts.push(...newPosts);
-          if (!state.feeds.find((feed) => newFeed.title === feed.title)) {
-            state.feeds.push(newFeed);
-            create(newFeed, newPosts, handleClick(watchedState1));
-          } else {
-            create(null, newPosts, handleClick(watchedState1));
-          }
-          setTimeout(parseAndCreate, 5000);
-        };
-        await parseAndCreate();
-        renderSuccess();
-      } catch (err) {
-        state.form.data.link = state.form.data.link.slice(0, -1);
-        if (err.message === 'Network Error') {
-          renderErrorsNetwork();
-        } else {
-          renderErrorsParser();
-        }
+    if (path.startsWith('errorsMessage')) {
+      if (value === 'Network Error') {
+        renderErrorsNetwork();
+      } else {
+        renderErrorsParser();
       }
+    }
+    if (path.startsWith('posts')) {
+      const newPosts = value.filter((post) => !previousValue.includes(post));
+      createPosts(newPosts, handleClick(watchedState1));
+    }
+    if (path.startsWith('feeds')) {
+      const newFeeds = value.filter((feed) => !previousValue.includes(feed));
+      createFeeds(...newFeeds);
     }
   });
 

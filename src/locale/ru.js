@@ -5,5 +5,7 @@ export default {
     invalidUrl: 'Ссылка должна быть валидным URL',
     errorParser: 'Ресурс не содержит валидный RSS',
     errorNetwork: 'Ошибка сети',
+    feeds: 'Фиды',
+    posts: 'Посты',
   },
 };

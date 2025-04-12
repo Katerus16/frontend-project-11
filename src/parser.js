@@ -4,22 +4,25 @@ export default (xmlString) => {
   // eslint-disable-next-line no-undef
   const parser = new DOMParser();
   const doc1 = parser.parseFromString(xmlString.replaceAll('\n', '').replaceAll('  ', ''), 'application/xml');
-  if (doc1.documentElement.nodeName !== 'rss') {
+  if (!doc1.querySelector('rss')) {
     throw new Error();
   }
   const feed = { id: uniqueId() };
-  const nodes = doc1.documentElement.firstChild.childNodes;
-  [...nodes]
-    .filter((node) => ['title', 'description'].includes(node.nodeName))
-    .forEach((node) => { feed[node.nodeName] = node.textContent.trim(); });
-  const parseItem = (item) => {
-    const itemNodes = item.childNodes;
-    const dataItem = { id: uniqueId(), feedId: feed.id };
-    [...itemNodes]
-      .filter((node) => ['title', 'link', 'description'].includes(node.nodeName))
-      .forEach((node) => { dataItem[node.nodeName] = node.textContent.trim(); });
-    return dataItem;
-  };
-  const posts = [...nodes].filter((node) => (node.nodeName) === 'item').map(parseItem);
+  const title = doc1.querySelector('title');
+  const description = doc1.querySelector('description');
+  feed.title = title.textContent.trim();
+  feed.description = description.textContent.trim();
+  const items = doc1.querySelectorAll('item');
+  const posts = [...items]
+    .map((item) => {
+      const titleItem = item.querySelector('title');
+      const descriptionItem = item.querySelector('description');
+      const linkItem = item.querySelector('link');
+      const post = { id: uniqueId(), feedId: feed.id };
+      post.link = linkItem.textContent.trim();
+      post.title = titleItem.textContent.trim();
+      post.description = descriptionItem.textContent.trim();
+      return post;
+    });
   return { feed, posts };
 };
